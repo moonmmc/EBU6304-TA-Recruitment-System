@@ -1,6 +1,0 @@
-TA001|Alice|123|TA|alice@bupt.edu|13800000001|Computer Science|Year 3|Java;Python;SQL|Assisted in lab sessions|CV_Alice.pdf|BUPT|3.7
-TA002|Charlie|123|TA|charlie@bupt.edu|13800000002|Software Engineering|Year 2|Java;C++||CV_Charlie.pdf|BUPT|3.5
-TA003|Diana|123|TA|diana@bupt.edu|13800000003|Computer Science|Year 3|Java;Testing;UML|One semester TA experience||BUPT|3.8
-MO001|Bob|123|MO|bob@bupt.edu|13900000001||||||||
-MO002|Prof. Wang|123|MO|wang@bupt.edu|13900000002||||||||
-ADMIN001|Admin|123|ADMIN|admin@bupt.edu|13900000000||||||||
