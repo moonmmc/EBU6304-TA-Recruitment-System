@@ -1,0 +1,6 @@
+POS001|MO001|Bob|Software Engineering|EBU6304|International School|3|8|50/hr|2026-04-15|Java;Agile;Testing;UML|Assist in lab sessions\nGrade assignments\nHold office hours|APPROVED
+POS002|MO001|Bob|Data Structures|EBU5302|International School|2|6|50/hr|2026-04-20|C++;Algorithms|Lead tutorials\nGrade programming assignments|APPROVED
+POS003|MO002|Prof. Wang|Database Systems|EBU5304|International School|1|4|50/hr|2026-03-28|SQL;ER Diagram|Help with SQL exercises\nGrade lab work|APPROVED
+POS004|MO001|Bob|Exam Invigilation|General|International School|10|0|60/hr|2026-05-01|No Prerequisites|Monitor exam halls\nDistribute papers|APPROVED
+POS005|MO001|Bob|Computer Networks|EBU5306|International School|2|6|50/hr|2026-04-25|TCP/IP;Networking|Assist network lab sessions|PENDING
+POS006|MO002|Prof. Wang|AI Fundamentals|EBU6308|International School|2|6|50/hr|2026-04-30|Python;ML;TensorFlow|Assist AI lab sessions|PENDING

@@ -1,0 +1,5 @@
+APP001|TA001|Alice|POS001|Software Engineering TA|EBU6304|2026-03-20|PASSED|Excellent skills match!
+APP002|TA001|Alice|POS002|Data Structures TA|EBU5302|2026-03-18|PENDING|Under review
+APP003|TA001|Alice|POS003|Database Systems TA|EBU5304|2026-03-15|FAILED|Position filled
+APP004|TA002|Charlie|POS001|Software Engineering TA|EBU6304|2026-03-19|PENDING|Under review
+APP005|TA003|Diana|POS001|Software Engineering TA|EBU6304|2026-03-18|PENDING|Under review

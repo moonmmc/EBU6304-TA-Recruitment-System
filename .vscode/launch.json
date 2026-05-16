@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "WebServerMain",
+            "request": "launch",
+            "mainClass": "com.bupt.ta.web.WebServerMain",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "WebServerMain",
+            "request": "launch",
+            "mainClass": "com.bupt.ta.web.WebServerMain",
+            "projectName": "com.bupt.ta-ta-recruitment-system"
+        },
+        {
+            "type": "java",
+            "name": "Web (Jetty) — WebServerMain",
+            "request": "launch",
+            "mainClass": "com.bupt.ta.web.WebServerMain",
+            "projectName": "ta-recruitment-system",
+            "cwd": "${workspaceFolder}/servlet"
+        }
+    ]
+}
