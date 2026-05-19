@@ -1,3 +1,0 @@
-TA001,Alice,123,TA,alice@bupt.edu
-MO001,Bob,123,MO,bob@bupt.edu
-ADMIN001,Admin,123,ADMIN,admin@bupt.edu

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Applications - BUPT TA Recruitment</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <nav class="sidebar"></nav>
+  <main class="main-content">
+    <div class="main-top">
+      <div><h2>Review Applications</h2><div class="mt-desc">Evaluate and manage TA applications for your courses</div></div>
+    </div>
+
+    <div class="form-group" style="max-width:300px">
+      <label class="form-label">Select Position</label>
+      <select class="form-select" id="posSelect" onchange="loadApplicants()">
+        <option value="">-- Choose a position --</option>
+      </select>
+    </div>
+
+    <div id="applicantsList"></div>
+
+    <div class="modal-overlay" id="feedbackModal">
+      <div class="modal modal-wide">
+        <h3 id="fbTitle">Review Applicant</h3>
+        <div id="fbDetail" style="margin-bottom:16px"></div>
+        <div class="form-group" id="fbFormGroup">
+          <label class="form-label">Feedback</label>
+          <textarea class="form-textarea" id="fbText" placeholder="Provide feedback for the applicant"></textarea>
+        </div>
+        <div class="modal-actions" id="fbActions">
+          <button class="btn btn-secondary" onclick="closeFb()">Close</button>
+          <button class="btn btn-danger" id="fbRejectBtn" onclick="decide('FAILED')">Reject</button>
+          <button class="btn btn-success" id="fbAcceptBtn" onclick="decide('PASSED')">Accept</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+let myPositions = [], allApps = [], currentAppId = '';
+bootstrapPage('MO', init, 'review');
+
+async function init() {
+  [myPositions, allApps] = await Promise.all([
+    api('/positions?moId=' + user.id),
+    api('/applications')
+  ]);
+
+  const sel = document.getElementById('posSelect');
+  myPositions.filter(p => p.status === 'APPROVED').forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.id;
+    o.textContent = p.courseName + ' (' + p.courseCode + ')';
+    sel.appendChild(o);
+  });
+}
+
+function loadApplicants() {
+  const posId = document.getElementById('posSelect').value;
+  const container = document.getElementById('applicantsList');
+  if (!posId) { container.innerHTML = ''; return; }
+
+  const apps = allApps.filter(a => a.positionId === posId);
+  if (apps.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="es-icon">👥</div><div class="es-text">No applicants for this position</div></div>';
+    return;
+  }
+
+  const colors = ['#2563EB', '#7C3AED', '#059669', '#D97706', '#DC2626'];
+  container.innerHTML = apps.map((a, i) => `
+    <div class="applicant-card">
+      <div class="applicant-avatar" style="background:${colors[i % colors.length]}">${initials(a.taName)}</div>
+      <div class="applicant-info">
+        <div class="ai-name">${escapeHtml(a.taName)}</div>
+        <div class="ai-detail">${a.taId} · Applied: ${formatDate(a.appliedDate)}</div>
+      </div>
+      <span class="badge ${badgeClass(a.status)}" style="margin-right:8px">${a.status}</span>
+      <div class="applicant-actions">
+        <button class="btn btn-sm btn-outline" onclick="openFb('${a.id}','${a.taId}', true)">Details</button>
+        ${a.status === 'PENDING' ? `<button class="btn btn-sm btn-primary" onclick="openFb('${a.id}','${a.taId}', false)">Review</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function renderApplicantProfile(u, app) {
+  const skills = (u.skills || '').split(';').map(s => s.trim()).filter(Boolean);
+  const pos = myPositions.find(p => p.id === app.positionId);
+  const required = pos && pos.requiredSkills
+    ? pos.requiredSkills.split(';').map(s => s.trim().toLowerCase()).filter(Boolean)
+    : [];
+  const color = '#2563EB';
+  return `
+    <div class="applicant-profile">
+      <div class="applicant-profile-header">
+        <div class="ap-avatar" style="background:${color}">${initials(u.name)}</div>
+        <div>
+          <div style="font-weight:700;font-size:16px;color:var(--gray-800)">${escapeHtml(u.name)}</div>
+          <div style="font-size:12px;color:var(--gray-500)">${escapeHtml(u.id)} · Applied ${formatDate(app.appliedDate)}</div>
+        </div>
+      </div>
+      <div class="applicant-profile-grid">
+        <div><span class="ap-label">Email</span>${escapeHtml(u.email || '-')}</div>
+        <div><span class="ap-label">Phone</span>${escapeHtml(u.phone || '-')}</div>
+        <div><span class="ap-label">Programme</span>${escapeHtml(u.programme || '-')}</div>
+        <div><span class="ap-label">Year of Study</span>${escapeHtml(u.yearOfStudy || '-')}</div>
+        <div><span class="ap-label">University</span>${escapeHtml(u.university || '-')}</div>
+        <div><span class="ap-label">GPA</span>${escapeHtml(u.gpa || '-')}</div>
+        <div><span class="ap-label">CV</span>${escapeHtml(u.cvFileName || 'Not uploaded')}</div>
+        <div><span class="ap-label">Application</span>${escapeHtml(app.status)}</div>
+      </div>
+      <div class="ap-block">
+        <span class="ap-label">Skills</span>
+        <div style="margin-top:6px">${skills.length
+          ? skills.map(s => {
+              const matched = required.some(r => s.toLowerCase().includes(r) || r.includes(s.toLowerCase()));
+              return `<span class="tag" style="${matched ? 'background:#DCFCE7;color:#166534' : ''}">${escapeHtml(s)}${matched ? ' ✓' : ''}</span>`;
+            }).join(' ')
+          : '-'}</div>
+      </div>
+      <div class="ap-block">
+        <span class="ap-label">Experience</span>
+        <p>${escapeHtml(u.experience || 'No experience provided')}</p>
+      </div>
+      ${app.feedback ? `<div class="ap-block"><span class="ap-label">Previous feedback</span><p>${escapeHtml(app.feedback)}</p></div>` : ''}
+    </div>`;
+}
+
+function setReviewMode(detailsOnly) {
+  const showReview = !detailsOnly;
+  document.getElementById('fbFormGroup').style.display = showReview ? '' : 'none';
+  document.getElementById('fbRejectBtn').style.display = showReview ? '' : 'none';
+  document.getElementById('fbAcceptBtn').style.display = showReview ? '' : 'none';
+}
+
+async function openFb(appId, taId, detailsOnly) {
+  currentAppId = appId;
+  const app = allApps.find(a => a.id === appId);
+  setReviewMode(detailsOnly);
+  document.getElementById('fbTitle').textContent = detailsOnly ? 'Applicant Details' : 'Review Applicant';
+  document.getElementById('fbDetail').innerHTML = '<div style="color:var(--gray-400);padding:12px 0">Loading profile…</div>';
+  document.getElementById('fbText').value = app && app.feedback ? app.feedback : '';
+  document.getElementById('feedbackModal').classList.add('show');
+  try {
+    const profile = await api('/users/' + encodeURIComponent(taId));
+    document.getElementById('fbTitle').textContent = (detailsOnly ? 'Details: ' : 'Review: ') + profile.name;
+    document.getElementById('fbDetail').innerHTML = renderApplicantProfile(profile, app);
+  } catch (err) {
+    document.getElementById('fbDetail').innerHTML = `<div class="note-box" style="margin:0">${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function closeFb() { document.getElementById('feedbackModal').classList.remove('show'); }
+
+async function decide(status) {
+  try {
+    await api('/applications/' + currentAppId + '/status', {
+      method: 'PUT',
+      body: JSON.stringify({ status, feedback: document.getElementById('fbText').value.trim() || (status === 'PASSED' ? 'Accepted' : 'Rejected') })
+    });
+    toast(status === 'PASSED' ? 'Applicant accepted!' : 'Applicant rejected');
+    closeFb();
+    allApps = await api('/applications');
+    loadApplicants();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+document.getElementById('feedbackModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeFb(); });
+</script>
+</body>
+</html>
