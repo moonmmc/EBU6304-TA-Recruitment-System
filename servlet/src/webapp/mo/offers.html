@@ -1,27 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Offer Letters - BUPT TA Recruitment</title>
 <link rel="stylesheet" href="/css/style.css">
+<style>
+.offers-wrap {
+  max-width: 920px;
+  margin: 0 auto;
+}
+.offers-header h2 { font-size: 26px; }
+.offers-header .mt-desc { font-size: 15px; margin-top: 6px; }
+.offers-filter-card {
+  padding: 28px 32px;
+  margin-bottom: 24px;
+}
+.offers-filter-card .form-label {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.offers-filter-card .form-select {
+  max-width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border-radius: 10px;
+}
+.offers-list-card {
+  padding: 28px 32px 32px;
+  min-height: 200px;
+}
+.offers-list-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin: 0 0 24px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.offers-placeholder {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--gray-400);
+  font-size: 15px;
+}
+#offersArea .empty-state {
+  padding: 64px 24px;
+}
+#offersArea .empty-state .es-icon { font-size: 56px; }
+#offersArea .empty-state .es-text { font-size: 16px; }
+#offersArea .offer-preview {
+  max-width: 100%;
+  padding: 36px 40px;
+  border-radius: 12px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow);
+}
+#offersArea .offer-preview:last-child { margin-bottom: 0; }
+#offersArea .offer-preview .op-header h3 { font-size: 22px; }
+#offersArea .offer-preview .op-body { font-size: 15px; line-height: 1.85; }
+@media (max-width: 768px) {
+  .offers-filter-card,
+  .offers-list-card { padding: 20px; }
+  #offersArea .offer-preview { padding: 24px 20px; }
+}
+</style>
 </head>
 <body>
 <div class="app-layout">
   <nav class="sidebar"></nav>
   <main class="main-content">
-    <div class="main-top">
-      <div><h2>Offer Letters</h2><div class="mt-desc">Generate and preview offer letters for accepted TAs</div></div>
-    </div>
+    <div class="offers-wrap">
+      <div class="main-top offers-header">
+        <div>
+          <h2>Offer Letters</h2>
+          <div class="mt-desc">Generate and preview offer letters for accepted TAs</div>
+        </div>
+      </div>
 
-    <div class="form-group" style="max-width:300px">
-      <label class="form-label">Select Position</label>
-      <select class="form-select" id="posSelect" onchange="loadOffers()">
-        <option value="">-- Choose a position --</option>
-      </select>
-    </div>
+      <div class="card offers-filter-card">
+        <label class="form-label" for="posSelect">Select position</label>
+        <select class="form-select" id="posSelect" onchange="loadOffers()">
+          <option value="">Choose a position...</option>
+        </select>
+      </div>
 
-    <div id="offersArea"></div>
+      <div class="card offers-list-card">
+        <h3 class="offers-list-title">Offer previews</h3>
+        <div id="offersArea">
+          <div class="offers-placeholder">Select a position above to preview offer letters.</div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -48,35 +120,38 @@ async function init() {
 function loadOffers() {
   const posId = document.getElementById('posSelect').value;
   const area = document.getElementById('offersArea');
-  if (!posId) { area.innerHTML = ''; return; }
+  if (!posId) {
+    area.innerHTML = '<div class="offers-placeholder">Select a position above to preview offer letters.</div>';
+    return;
+  }
 
   const pos = myPositions.find(p => p.id === posId);
   const accepted = allApps.filter(a => a.positionId === posId && a.status === 'PASSED');
 
   if (accepted.length === 0) {
-    area.innerHTML = '<div class="empty-state"><div class="es-icon">📄</div><div class="es-text">No accepted applicants for this position yet</div></div>';
+    area.innerHTML = '<div class="empty-state"><div class="es-icon">&#128196;</div><div class="es-text">No accepted applicants for this position yet</div></div>';
     return;
   }
 
   area.innerHTML = accepted.map(a => `
-    <div class="offer-preview" style="margin-bottom:24px">
+    <div class="offer-preview">
       <div class="op-header">
-        <div style="font-size:12px;color:var(--gray-400);margin-bottom:4px">Beijing University of Posts and Telecommunications</div>
+        <div style="font-size:13px;color:var(--gray-400);margin-bottom:6px">Beijing University of Posts and Telecommunications</div>
         <h3>Teaching Assistant Offer Letter</h3>
       </div>
       <div class="op-body">
         <p>Dear <span class="op-field">${escapeHtml(a.taName)}</span>,</p>
-        <p style="margin-top:12px">We are pleased to offer you the position of <strong>Teaching Assistant</strong> for the course:</p>
-        <p style="margin:12px 0"><span class="op-field">${escapeHtml(pos.courseName)}</span> (<span class="op-field">${pos.courseCode}</span>)</p>
+        <p style="margin-top:14px">We are pleased to offer you the position of <strong>Teaching Assistant</strong> for the course:</p>
+        <p style="margin:14px 0"><span class="op-field">${escapeHtml(pos.courseName)}</span> (<span class="op-field">${pos.courseCode}</span>)</p>
         <p><strong>Details:</strong></p>
-        <ul style="padding-left:20px;margin:8px 0">
+        <ul style="padding-left:22px;margin:10px 0">
           <li>Department: ${escapeHtml(pos.department)}</li>
-          <li>Hours per Week: ${pos.hoursPerWeek}</li>
-          <li>Pay Rate: ${pos.payRate}</li>
-          <li>Module Owner: ${escapeHtml(pos.moName)}</li>
+          <li>Hours per week: ${pos.hoursPerWeek}</li>
+          <li>Pay rate: ${pos.payRate}</li>
+          <li>Module owner: ${escapeHtml(pos.moName)}</li>
         </ul>
-        <p style="margin-top:12px">Please confirm your acceptance by responding to this offer within 7 days.</p>
-        <p style="margin-top:16px">Best regards,<br><strong>${escapeHtml(pos.moName)}</strong><br>${pos.department}</p>
+        <p style="margin-top:14px">Please confirm your acceptance by responding to this offer within 7 days.</p>
+        <p style="margin-top:20px">Best regards,<br><strong>${escapeHtml(pos.moName)}</strong><br>${escapeHtml(pos.department)}</p>
       </div>
     </div>`).join('');
 }
